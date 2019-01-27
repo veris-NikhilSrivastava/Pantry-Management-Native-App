@@ -23,19 +23,38 @@ import CustomModal from "../Modal/Modal";
 const user = {
 
         morning:{
-            beverage:'coffee',
+            beverages:[
+                {
+                value:'Coffee'
+            },{
+                 value:'Tea'
+                }
+            ],
             url:require('../../assets/Images/morning-beverage.png'),
             title:'Morning Beverage',
             message:'What would you like to start your day with?'
         },
         evening:{
-            beverage:'tea',
+            beverages:[{
+                value:'Tea'
+            },{
+                value:'Coffee'
+                }
+                ],
             url:require('../../assets/Images/evening-beverage.jpg'),
             title:'Evening Beverage',
             message:'Ahhh! Tiring day. Want some refreshment?'
 
         },
         lunch: {
+            timings:[
+                {
+                    value:'1:30'
+                },
+                {
+                    value:'2:30'
+                }
+            ],
             title:'Lunch Slot',
             url:require('../../assets/Images/lunch-slot.jpg'),
             message:'Feeling hungy? Meet me in the Pantry'
@@ -69,7 +88,6 @@ export class HomeScreen extends Component {
         return (
             <View style={styles.container}>
                 <CustomHeader/>
-
                 <View style={styles.infoContainer}>
                     <View style={{
                         flexDirection: 'row',
@@ -106,6 +124,7 @@ export class HomeScreen extends Component {
                 {this.state.morningBeverageModal?
                     <CustomModal
                         modalState={this.state.morningBeverageModal}
+                        data={user.morning.beverages}
                         title={user.morning.title}
                         message={user.morning.message}
                         url={user.morning.url}
@@ -114,6 +133,7 @@ export class HomeScreen extends Component {
                 {this.state.eveningBeverageModal?
                     <CustomModal
                         modalState={this.state.eveningBeverageModal}
+                        data={user.evening.beverages}
                         title={user.evening.title}
                         message={user.evening.message}
                         url={user.evening.url}
@@ -122,12 +142,11 @@ export class HomeScreen extends Component {
                 {this.state.lunchModal?
                     <CustomModal
                         modalState={this.state.lunchModal}
+                        data={user.lunch.timings}
                         title={user.lunch.title}
                         message={user.lunch.message}
                         url={user.lunch.url}
                     />:null}
-
-
 
 
                 {/* <Modal isVisible={this.state.eveningBeverageModal}

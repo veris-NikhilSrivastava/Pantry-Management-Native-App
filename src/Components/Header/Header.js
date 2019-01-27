@@ -1,6 +1,7 @@
 import React,{Component} from 'react';
 import {Image, StyleSheet, Text, TouchableOpacity, View} from 'react-native';
 import { Container, Header, Left, Body, Right, Button, Icon, Title } from 'native-base';
+import { withRouter } from "react-router";
 
 export class CustomHeader extends Component{
     constructor(props){
@@ -17,10 +18,10 @@ export class CustomHeader extends Component{
                         </TouchableOpacity>
                     </Left>
                     <View style={{flexDirection:'row',marginLeft:30,width:250,alignItems:'center',justifyContent:'center'}}>
-                        <TouchableOpacity style={{flex:1}}>
+                        <TouchableOpacity style={{flex:1}} onPress={()=>this.props.history.replace('/homeScreen')}>
                             <Image source={require('../../assets/Images/home-icon.png')} style={{width:55,height:55}}/>
                         </TouchableOpacity>
-                        <TouchableOpacity style={{flex:1}}>
+                        <TouchableOpacity style={{flex:1}} onPress={()=>this.props.history.replace('/orderScreen')}>
                             <Image source={require('../../assets/Images/order-icon.png')} style={{width:55,height:55}}/>
                         </TouchableOpacity>
                         <TouchableOpacity style={{flex:1}}>
@@ -45,4 +46,4 @@ const styles=StyleSheet.create({
     }
 });
 
-export default CustomHeader;
+export default withRouter(CustomHeader);

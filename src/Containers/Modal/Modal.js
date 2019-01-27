@@ -2,6 +2,7 @@ import React,{Component} from 'react';
 import {Image, StyleSheet, Text, TouchableOpacity, View} from 'react-native';
 import { Container, Header, Left, Body, Right, Button, Icon, Title } from 'native-base';
 import Modal from "react-native-modal";
+import { Dropdown } from 'react-native-material-dropdown';
 
 export class CustomModal extends Component{
     constructor(props){
@@ -12,6 +13,7 @@ export class CustomModal extends Component{
     }
 
     render(){
+        let data = this.props.data
         return(
             <View style={styles.container}>
                 <Modal isVisible={this.state.modalState}
@@ -24,10 +26,17 @@ export class CustomModal extends Component{
                        onBackdropPress={() =>this.setState({modalState:false})}
                 >
                     <View style={styles.modalContainer}>
-                        <Text style={{fontSize:37,textAlign: 'center',height:70,paddingTop:-20}}>{this.props.title}</Text>
+                        <Text style={{fontSize:37,textAlign: 'center',height:70,paddingTop:-20,color:'black'}}>{this.props.title}</Text>
                         <Text style={{fontSize:20,flexWrap:'wrap',textAlign:'center'}}>{this.props.message}</Text>
                         <Image source={this.props.url} style={{width:200,height:200}}/>
+                        <Dropdown
+                            containerStyle={{width:'80%'}}
+                            label='Set Preference'
+                            dropdownPosition={-2}
+                            data={data}
+                        />
                     </View>
+
                 </Modal>
             </View>
         );

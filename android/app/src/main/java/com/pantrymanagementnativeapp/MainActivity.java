@@ -18,7 +18,7 @@ public class MainActivity extends ReactActivity {
 
 }
 
-    @Override
+    /*@Override
     protected ReactActivityDelegate createReactActivityDelegate() {
         return new ReactActivityDelegate(this, getMainComponentName()) {
             @Override
@@ -26,5 +26,5 @@ public class MainActivity extends ReactActivity {
                 return new RNGestureHandlerEnabledRootView(MainActivity.this);
             }
         };
-    }
-}
+    }*/
+
