@@ -15,7 +15,7 @@ import {
 
 import Axios from 'axios';
 import Modal from "react-native-modal";
-import SpinnerButton from 'react-native-spinner-button';
+import Spinner from "../../Components/spinner/Spinner";
 const loginURL = 'https://awkn0po82h.execute-api.us-east-1.amazonaws.com/authenticate';
 const signupURL = 'https://6xiyxvrwqg.execute-api.us-east-1.amazonaws.com/join';
 
@@ -48,14 +48,15 @@ export class Login extends Component {
 
     //checks for basic form validation like empty fields for SIGNUP API
     handleSignupFormValidation = (e) => {
+        this.setState({isLoading:true})
         e.preventDefault();
         if (this.state.email === '')
-            this.setState({newEmailErrorState: true})
+            this.setState({newEmailErrorState: true,isLoading:false})
 
         if (this.state.numberInPasswordError === false && this.state.newEmailErrorState === false && this.state.email !== '' && this.state.uppercaseInPasswordError === false && this.state.passwordLengthError === false)
             this.newAccountHandler();
         else {
-            this.setState({newPasswordErrorState: true})
+            this.setState({newPasswordErrorState: true,isLoading:false})
         }
 
     };
@@ -73,12 +74,12 @@ export class Login extends Component {
         else {
             if (email === '' && password === '') {
                 this.setState({emailErrorState: true});
-                this.setState({passwordErrorState: true});
+                this.setState({passwordErrorState: true,isLoading:false});
             } else {
                 if (password === '')
-                    this.setState({passwordErrorState: true});
+                    this.setState({passwordErrorState: true,isLoading:false});
                 else
-                    this.setState({emailErrorState: true})
+                    this.setState({emailErrorState: true,isLoading:false})
             }
         }
     };
@@ -95,10 +96,9 @@ export class Login extends Component {
             .then(res => {
                 switch (res.status) {
                     case 200:
-                        alert("Logged in!");
                         console.log("userID")
                         console.log(res.data.user_id)
-                        this.setState({isLoggedIn: true,user_id:res.data.user_id,isLoading:false});
+                        this.setState({isLoggedIn: true,user_id:res.data.user_id});
                         AsyncStorage.setItem('user_details',JSON.stringify(this.state.user_id))
                         setTimeout(()=>this.props.history.replace(`/homeScreen/${res.data.user_id}`),1500);
                         break;
@@ -107,7 +107,7 @@ export class Login extends Component {
                 }
             })
             .catch(err => {
-                this.setState({incorrectPasswordStatus: true})
+                this.setState({incorrectPasswordStatus: true,isLoading:false})
             })
     };
 
@@ -123,6 +123,7 @@ export class Login extends Component {
             .then(res => {
                 alert("Successfully signed up!!");
                 this.setState({isModalVisible: !this.state.isModalVisible});
+                this.setState({isLoading:false})
             })
             .catch(err => {
                 switch (err.response.status) {
@@ -143,7 +144,8 @@ export class Login extends Component {
         this.setState({password: value}, () => {
             this.setState({
                 passwordErrorState: false,
-                newPasswordErrorState:false
+                newPasswordErrorState:false,
+                incorrectPasswordStatus:false
             })
             if (lengthRegex.test(this.state.password) !== true)//if false
                 this.setState({passwordLengthError: true});
@@ -169,7 +171,8 @@ export class Login extends Component {
                     newPasswordErrorState:false,
                     passwordLengthError: true,
                     numberInPasswordError: true,
-                    uppercaseInPasswordError: true
+                    uppercaseInPasswordError: true,
+                    incorrectPasswordStatus:false
                 });
         })
     };
@@ -193,26 +196,17 @@ export class Login extends Component {
     render() {
         return (
             <KeyboardAvoidingView behavior="padding" style={styles.container}>
+                {this.state.isLoading?<Spinner/>:null}
                 <TouchableWithoutFeedback style={styles.container} onPress={Keyboard.dismiss}>
                     <View style={styles.container}>
                         <View style={styles.infoContainer}>
                             <View style={styles.imgContainer}>
                                 <Image source={require('../../assets/Images/logo.gif')}
-                                       style={{width: 300, height: 300}}/>
+                                       style={{width: 250, height: 250}}/>
                             </View>
-                            <SpinnerButton
-                                indicatorCount={10}
-                                isLoading={true}
-                                size={50}
-                                buttonStyle={{justifyContent: 'center',
-                                        alignItems: 'center',
-                                        height: 50,
-                                        backgroundColor: '#25CAC6',
-                                    }}
-                            />
                             <TextInput style={styles.input}
                                        placeholder="Enter the email address"
-                                       placeholderTextColor='rgba(255,255,255,0.8)'
+                                       placeholderTextColor='rgb(255,255,255)'
                                        keyboardType='email-address'
                                        returnKeyType='next'
                                        autoCorrect={false}
@@ -220,11 +214,11 @@ export class Login extends Component {
                                        onChangeText={(email) => this.validationEmail(email)}
                             />
                             {this.state.emailErrorState ? (
-                                <Text style={{color: 'red',marginTop:-20}}>Please enter an email!</Text>) : null}
+                                <Text style={{color: 'red',fontFamily:'Raleway-Light',marginTop:-20}}>Please enter an email!</Text>) : null}
 
                             <TextInput style={styles.input}
                                        placeholder="Enter the password"
-                                       placeholderTextColor='rgba(255,255,255,0.8)'
+                                       placeholderTextColor='rgb(255,255,255)'
                                        secureTextEntry
                                        returnKeyType='go'
                                        autoCorrect={false}
@@ -232,14 +226,12 @@ export class Login extends Component {
                                        onChangeText={(password) => this.validationPassword(password)}
                             />
                             {this.state.passwordErrorState ? (
-                                <Text style={{color: 'red',marginTop:-20}}>Please enter valid password!</Text>) : null}
+                                <Text style={{color: 'red',marginTop:-20,fontFamily:'Raleway-Light'}}>Please enter valid password!</Text>) : null}
                             {this.state.incorrectPasswordStatus ? (
-                                <Text style={{color: 'red'}}>Invalid Password!</Text>) : null}
+                                <Text style={{color: 'red',marginTop:-20,fontFamily:'Raleway-Light'}}>Invalid Password!</Text>) : null}
 
                             <TouchableOpacity style={styles.buttonContainer} onPress={(e) => this.handleLoginFormValidation(e)}>
                                 <Text style={styles.buttonText}>Login</Text>
-                                {this.state.isLoading?
-                                <ActivityIndicator size={50} style={{flex:1,flexDirection:'column'}} color='rgba(245, 245,245,0.5)'/>:null}
                             </TouchableOpacity>
                             <View style={{
                                 flexDirection: 'row',
@@ -247,8 +239,8 @@ export class Login extends Component {
                                 fontWeight: 'bold',
                                 marginTop: 5
                             }}>
-                                <Text style={{color: 'black'}}>Not a member?</Text>
-                                <Text style={{color: 'black'}}
+                                <Text style={{color: 'black',fontFamily:'Raleway-Bold'}}>Not a member?</Text>
+                                <Text style={{color: 'black',fontFamily:'Raleway-Bold'}}
                                       onPress={() => this.setState({isModalVisible: !this.state.isModalVisible})}> Sign
                                     Up</Text>
                             </View>
@@ -260,7 +252,7 @@ export class Login extends Component {
                                        animationIn='slideInDown'
                                        animationOut='slideOutUp'
                                        transparent={true}
-                                       onBackdropPress={() => this.setState({isModalVisible: false})}
+                                       onBackdropPress={() => this.setState({isModalVisible: false,newEmailErrorState:false,newPasswordErrorState:false})}
                                 >
                                     <View style={styles.modalContainer}>
                                         <Text style={{
@@ -268,11 +260,12 @@ export class Login extends Component {
                                             color: 'black',
                                             textAlign: 'center',
                                             fontSize: 50,
-                                            marginBottom: 20
+                                            marginBottom: 20,
+                                            fontFamily:'Raleway-Bold'
                                         }}>Signup</Text>
                                         <TextInput style={styles.input}
                                                    placeholder="Enter the name"
-                                                   placeholderTextColor='rgba(255,255,255,0.8)'
+                                                   placeholderTextColor='rgb(255,255,255)'
                                                    keyboardType='email-address'
                                                    returnKeyType='next'
                                                    autoCorrect={false}
@@ -282,7 +275,7 @@ export class Login extends Component {
                                         <View style={{flexDirection: 'column'}}>
                                             <TextInput style={styles.input}
                                                        placeholder="Enter the email address"
-                                                       placeholderTextColor='rgba(255,255,255,0.8)'
+                                                       placeholderTextColor='rgb(255,255,255)'
                                                        keyboardType='email-address'
                                                        returnKeyType='next'
                                                        autoCorrect={false}
@@ -290,7 +283,7 @@ export class Login extends Component {
                                                        onChangeText={(email) => this.validationEmail(email)}
                                             />
                                             {this.state.newEmailErrorState ? (
-                                                <Text style={{color: 'red', alignSelf: 'flex-start',marginTop:-20}}>Please enter a
+                                                <Text style={{color: 'red',fontFamily:'Raleway-Light', alignSelf: 'flex-start',marginTop:-20}}>Please enter a
                                                     valid email!</Text>) : null}
                                         </View>
                                         <TextInput style={styles.input}
@@ -304,20 +297,20 @@ export class Login extends Component {
                                         />
                                         <View style={{marginBottom: 10}}>
                                             {this.state.newPasswordErrorState ? (
-                                                <Text style={{color: 'red',marginTop:-20}}>Please enter valid
+                                                <Text style={{color: 'red',fontFamily:'Raleway-Light',marginTop:-20}}>Please enter valid
                                                     password!</Text>) : null}
-                                            <View style={{flexDirection: 'row', flexWrap: 'wrap',marginTop:20}}>
-                                                <Text>Make sure it contains</Text>
+                                            <View style={{fontFamily:'Raleway-Light',flexDirection: 'row', flexWrap: 'wrap',marginTop:20}}>
+                                                <Text style={{fontFamily:'Raleway-Light',}}>Make sure it contains</Text>
                                                 {this.state.passwordLengthError ? (
-                                                        <Text style={{color: 'red'}}> at least 8 characters</Text>) :
-                                                    <Text> at least 8 characters</Text>}
+                                                        <Text style={{fontFamily:'Raleway-Light',color: 'red'}}> at least 8 characters</Text>) :
+                                                    <Text style={{fontFamily:'Raleway-Light'}}> at least 8 characters</Text>}
                                                 {this.state.numberInPasswordError ? (
-                                                    <Text style={{color: 'red'}}> including a number </Text>) : (
-                                                    <Text>including a number </Text>)}
-                                                <Text> and</Text>
+                                                    <Text style={{color: 'red',fontFamily:'Raleway-Light',}}> including a number </Text>) : (
+                                                    <Text style={{fontFamily:'Raleway-Light',}}>including a number </Text>)}
+                                                <Text style={{fontFamily:'Raleway-Light',}}> and</Text>
                                                 {this.state.uppercaseInPasswordError ? (
-                                                    <Text style={{color: 'red'}}> a uppercase letter.</Text>) : (
-                                                    <Text> a uppercase letter</Text>)}
+                                                    <Text style={{color: 'red',fontFamily:'Raleway-Light',}}> a uppercase letter.</Text>) : (
+                                                    <Text style={{fontFamily:'Raleway-Light',}}> a uppercase letter</Text>)}
                                             </View>
                                         </View>
                                         <TouchableOpacity style={styles.buttonContainer}
@@ -345,8 +338,6 @@ const styles = StyleSheet.create({
             flex: 1,
             backgroundColor: '#FFF',
             width: '100%',
-            // paddingTop:20
-            // flexDirection: 'column'
         },
     titleContainer: {
         marginVertical: 100,
@@ -358,7 +349,7 @@ const styles = StyleSheet.create({
         textAlign: 'center',
         fontSize: 30,
         opacity: 0.9,
-        fontFamily: 'Octicon'
+        fontFamily: 'Century-Gothic'
     },
     infoContainer: {
         position: 'relative',
@@ -382,36 +373,32 @@ const styles = StyleSheet.create({
     },
     input: {
         height: 50,
+        fontFamily:'Raleway-Light',
         backgroundColor: 'lightgrey',
         marginBottom: 20,
         paddingHorizontal: 10,
         borderRadius: 10,
     },
     buttonContainer: {
-        backgroundColor: '#249e40', //72c585 disbled
-        flexDirection:'row',
-        // flex:1,
+        backgroundColor: '#72c585', //72c585 disbled249e40
         paddingVertical: 15,
         borderRadius: 10,
-        height:65
+        height:65,
+        marginTop:20
     },
     buttonText: {
-        flexDirection:'column',
-        // backgroundColor:'red',
         textAlign: 'center',
-        fontFamily: 'Raleway-Bold',
+        fontFamily: 'Raleway-Light',
         fontSize: 27,
-        flex:2,
-         paddingLeft:10,
-        marginLeft: 30,
-        marginRight: -20
+        color:'white'
     },
     imgContainer: {
         flexDirection: 'column',
         justifyContent: 'flex-start',
-        marginTop: -50,
-        marginBottom: 30,
+        marginTop: -40,
+        marginBottom: 50,
         alignItems: 'flex-end',
+        paddingRight: 35,
 
     }
 

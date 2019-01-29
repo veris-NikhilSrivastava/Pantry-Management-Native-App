@@ -17,6 +17,7 @@ import Modal from "react-native-modal";
 import {ModalArticleRow} from "./ModalArticlesRow/ModalArticleRow";
 import Axios from 'axios';
 import Toast, {DURATION} from 'react-native-easy-toast'
+import Spinner from "../../Components/spinner/Spinner";
 
 
 const inventoryURL='https://2kyff8ynsi.execute-api.us-east-1.amazonaws.com/inventory';
@@ -44,6 +45,7 @@ export class OrderScreen extends Component {
     }
 
     componentDidMount(){
+        this.setState({isLoading:true})
         this.getUserId();
         this.getInventoryData();
     }
@@ -52,24 +54,11 @@ export class OrderScreen extends Component {
         axios
             .get(inventoryURL)
             .then(res=>{
-                this.setState({inventoryData:res.data})
+                this.setState({inventoryData:res.data,isLoading:false})
             })
             .catch(err=>{
                 alert("Oops! Something went wrong!")
             })
-    }
-
-    componentDidUpdate(){
-        console.log('uodates');
-        /*axios
-            .get(inventoryURL)
-            .then(res=>{
-                this.setState({inventoryData:res.data})
-            })
-            .catch(err=>{
-                alert("Oops! Something went wrong!")
-            })*/
-
     }
 
     /* saveProductDetails = () => {
@@ -163,7 +152,7 @@ export class OrderScreen extends Component {
 
     //handle place order API
     placeOrder=()=>{
-
+        this.setState({isLoading:true})
         let data=this.state.itemArray;
         const orderData={
             user_id:this.state.userId,
@@ -175,6 +164,8 @@ export class OrderScreen extends Component {
                 alert('order Placed');
                 this.getInventoryData();
                 this.setState({isModalVisible:false})
+                this.setState({isLoading:false})
+
             })
             .catch(err=>{
                 console.log(err.response.data);
@@ -205,10 +196,11 @@ export class OrderScreen extends Component {
         console.log(data)
         return (
             <View style={styles.container}>
+                {this.state.isLoading?<Spinner/>:null}
                 <CustomHeader/>
-                <Text style={{color:"grey",marginTop:20,fontSize:35, textAlign:'center'}}>Inventory</Text>
+                <Text style={{fontFamily:'Raleway-Regular',color:"grey",marginTop:20,fontSize:45, textAlign:'center'}}>Inventory</Text>
                 <View style={{height: 390, marginTop: 10}}>
-                    <Text style={{color:"grey",marginTop:50,fontSize:35, textAlign:'center'}}>Sorry! People are very hungry. We'll restock the items soon</Text>
+                    {data.length?<Text style={{fontFamily:'Raleway-Light',color:"grey",marginTop:70,marginLeft:5,marginRight:5,fontSize:30,textAlign:'center'}}>Sorry! People are very hungry. We'll restock the items soon</Text>:null}
                     <ScrollView
                         onContentSizeChange={this.onContentSizeChange}
                     >
@@ -241,7 +233,7 @@ export class OrderScreen extends Component {
                        })}
                 >
                     <View style={styles.modalContainer}>
-                        <Text style={{fontSize:30,textAlign:'center',paddingBottom: 20}}>Order Summary</Text>
+                        <Text style={{fontSize:35,textAlign:'center',paddingBottom: 20,fontFamily:'Raleway-Light'}}>Order Summary</Text>
                         <Image source={require('../../assets/Images/empty-cart.jpg')}style={{width:160,height:100,marginHorizontal:80,marginBottom:10}}/>
                         <ScrollView>
                             {this.state.itemArray.map((item, key) => (
@@ -264,7 +256,7 @@ export class OrderScreen extends Component {
                             height: 50,
                             borderRadius: 10
                         }} onPress={() => this.placeOrder()}>
-                            <Text style={{textAlign: 'center', fontSize: 23, paddingVertical: 8, paddingHorizontal: 50}}>PLACE
+                            <Text style={{textAlign: 'center',color:'white',fontSize: 22,fontFamily:'Raleway-Light', paddingVertical: 10, paddingHorizontal: 50}}>PLACE
                                 ORDER</Text>
                         </TouchableOpacity>
                     </View>

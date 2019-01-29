@@ -3,6 +3,7 @@ import {Image, StyleSheet, Text, TouchableOpacity, View} from 'react-native';
 import { Container, Header, Left, Body, Right, Button, Icon, Title } from 'native-base';
 import { withRouter } from "react-router";
 import Sidebar from "../Sidebar/sidebar";
+import Spinner from "../spinner/Spinner";
 
 export class CustomHeader extends Component{
     constructor(props) {
@@ -15,10 +16,16 @@ export class CustomHeader extends Component{
     sidebarVisibility=()=>{
         this.setState({isSidebarVisible:false})
     }
+    handleLogout=()=>{
+        this.setState({isLoading:true})
+        setTimeout(()=>this.props.history.replace('/login'),1000)
+        this.setState({isLoading:false})
+    }
 
     render(){
         return(
             <View>
+                {this.state.isLoading?<Spinner/>:null}
                 <Header style={{width:360,backgroundColor:'lightgrey',height:70}}>
                     <Left>
                         <TouchableOpacity onPress={()=>this.setState({isSidebarVisible:true},console.log(this.state.isSidebarVisible))}>
@@ -31,7 +38,7 @@ export class CustomHeader extends Component{
                         handleSidebarVisibility={this.sidebarVisibility}
                     />
                     <Right>
-                        <TouchableOpacity onPress={()=>this.props.history.replace('/login')}>
+                        <TouchableOpacity onPress={()=>this.handleLogout()}>
                             <Image source={require('../../assets/Images/logout.png')} style={{marginTop:10,width:30,height:30}}/>
                         </TouchableOpacity>
                     </Right>

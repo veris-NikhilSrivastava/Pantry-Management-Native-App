@@ -4,6 +4,7 @@ import { Container, Header, Left, Body, Right, Button, Icon, Title } from 'nativ
 import Modal from "react-native-modal";
 import { Dropdown } from 'react-native-material-dropdown';
 import Axios from 'axios';
+import Spinner from "../../Components/spinner/Spinner";
 const beverageURL='https://h3sp46qcq0.execute-api.us-east-1.amazonaws.com/beverage'
 
 const axios = Axios.create({});
@@ -11,14 +12,14 @@ export class CustomModal extends Component{
     constructor(props){
         super(props);
         this.state={
-            modalState:this.props.modalState
+            modalState:this.props.modalState,
         }
     }
 
 
     //handles preferences setting PATCH API
     handlePreferences=(value)=> {
-         this.setState({morningPref:4});
+        this.setState({morningPref:4});
         this.setState({eveningPref:4});
         if(this.props.title==='Morning Beverage')
         {
@@ -60,7 +61,7 @@ export class CustomModal extends Component{
 
             }
         }
-
+        this.setState({isLoading:true})
         const obj= {
             user_id: this.props.userId,
             morning: this.state.morningPref,
@@ -72,6 +73,7 @@ export class CustomModal extends Component{
             .then(res=>{
                 this.props.onPreferencesChange(this.state.morningPref,this.state.eveningPref)
                 this.setState({modalState:false})
+                this.setState({isLoading:false})
             })
             .catch(err=>{
                 console.log(err.response)
@@ -91,6 +93,7 @@ export class CustomModal extends Component{
         ];
         return(
             <View style={styles.container}>
+                {this.state.isLoading?<Spinner/>:null}
                 <Modal isVisible={this.state.modalState}
                        backdropOpacity={0.4}
                        animationInTiming={700}
@@ -112,8 +115,6 @@ export class CustomModal extends Component{
                             // value={this.state.value}
                             onChangeText={(value)=>this.handlePreferences(value)}
                         />
-                        {/*<TouchableOpacity onPress={()=alert}>
-                        </TouchableOpacity>*/}
                     </View>
 
                 </Modal>
@@ -125,7 +126,8 @@ const styles=StyleSheet.create({
     container: {
         flex: 1,
         alignItems: 'center',
-        marginVertical: 30
+        marginVertical: 30,
+        zIndex: -40
     },
     modalContainer: {
         backgroundColor: '#FFF',
@@ -135,7 +137,8 @@ const styles=StyleSheet.create({
         height: '75%',
         marginBottom: 20,
         alignItems:'center',
-        justifyContent: 'center'
+        justifyContent: 'center',
+        zIndex: -40
 
     },
 });

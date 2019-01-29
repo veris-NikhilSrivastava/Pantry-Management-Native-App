@@ -21,6 +21,7 @@ import Modal from "react-native-modal";
 import CustomHeader from "../../Components/Header/Header";
 import CustomModal from "../Modal/Modal";
 import Axios from 'axios';
+import Spinner from "../../Components/spinner/Spinner";
 
 const user = {
 
@@ -75,10 +76,13 @@ export class HomeScreen extends Component {
             beverageDetails:[],
             morningLabel:'',
             eveningLabel:'',
+
         }
+
     };
 
     componentDidMount(){
+        this.setState({isLoading:true})
         this.getUserId();
         const beverageURL=`https://h3sp46qcq0.execute-api.us-east-1.amazonaws.com/beverage?user_id=${this.props.match.params.id}`;
         console.log(beverageURL)
@@ -107,7 +111,7 @@ export class HomeScreen extends Component {
                     case 8: this.setState({eveningLabel:'Green Tea'})
                         break;
                 }
-
+                this.setState({isLoading:false})
             })
             .catch(err=>{
                 alert('something wrong happened')
@@ -124,38 +128,29 @@ export class HomeScreen extends Component {
         }
     }
 
-  /*  modalHandler=()=>{
-        this.setState({
-            morningBeverageModal:false,
-            lunchModal: false,
-            eveningBeverageModal: false
-        })
-    }*/
-
   //handles defaults beverages specific to a user
     handlePreferencesLabels=(mornLabel,evenLabel)=>{
-    console.log(mornLabel+evenLabel)
         switch (mornLabel) {
-            case 4: this.setState({morningLabel:'Coffee'})
+            case 4: this.setState({morningLabel:'Coffee',isLoading:false})
                 break;
-            case 3: this.setState({morningLabel:'Tea'})
+            case 3: this.setState({morningLabel:'Tea',isLoading:false})
                 break;
-            case 7: this.setState({morningLabel:'Iced Tea'})
+            case 7: this.setState({morningLabel:'Iced Tea',isLoading:false})
                 break;
-            case 8: this.setState({morningLabel:'Green Tea'})
+            case 8: this.setState({morningLabel:'Green Tea',isLoading:false})
                 break;
             default:
                 break;
 
         }
         switch (evenLabel) {
-            case 4: this.setState({eveningLabel:'Coffee'})
+            case 4: this.setState({eveningLabel:'Coffee',isLoading:false})
                 break;
-            case 3: this.setState({eveningLabel:'Tea'})
+            case 3: this.setState({eveningLabel:'Tea',isLoading:false})
                 break;
-            case 7: this.setState({eveningLabel:'Iced Tea'})
+            case 7: this.setState({eveningLabel:'Iced Tea',isLoading:false})
                 break;
-            case 8: this.setState({eveningLabel:'Green Tea'})
+            case 8: this.setState({eveningLabel:'Green Tea',isLoading:false})
                 break;
             default:
                 break;
@@ -166,6 +161,7 @@ export class HomeScreen extends Component {
     render() {
         return (
             <View style={styles.container}>
+                {this.state.isLoading?<Spinner/>:null}
                 <CustomHeader
                 userId={this.props.match.params.id}
                 />
@@ -181,22 +177,21 @@ export class HomeScreen extends Component {
                                style={{width: 150, height: 150}}/>
                     </View>
 
-                    <View style={{flexDirection: 'row', flexWrap: 'wrap', marginLeft: 10}}>
-                        <Text style={{fontSize: 20}}>You will be served </Text>
+                    <View style={{flexDirection: 'row', flexWrap: 'wrap',textAlign:'center', marginLeft: 10}}>
+                        <Text style={{fontSize: 20,textAlign:'center',fontFamily:'Raleway-Light'}}>You will be served </Text>
                         <TouchableOpacity
                             onPress={() => this.setState({morningBeverageModal: !this.state.morningBeverageModal})}>
-                            <Text style={{fontWeight: 'bold', fontSize: 20}}>{this.state.morningLabel} </Text>
-                        </TouchableOpacity>
-                        <Text style={{fontSize: 20}}>in the Morning, Lunch at </Text>
+                            <Text style={{fontWeight: 'bold', fontSize: 20,fontFamily:'Raleway-Bold'}}>{this.state.morningLabel} </Text>
+                        </TouchableOpacity><Text style={{fontSize: 20,fontFamily:'Raleway-Light'}}>in the Morning, Lunch at </Text>
                         <TouchableOpacity onPress={() => this.setState({lunchModal: !this.state.lunchModal})}>
-                            <Text style={{fontWeight: 'bold', fontSize: 20}}>1:30 </Text>
+                            <Text style={{fontWeight: 'bold', fontSize: 20,fontFamily:'Raleway-Bold'}}>1:30 </Text>
                         </TouchableOpacity>
-                        <Text style={{fontSize: 20}}>and </Text>
+                        <Text style={{fontSize: 20,fontFamily:'Raleway-Light'}}>and </Text>
                         <TouchableOpacity
                             onPress={() => this.setState({eveningBeverageModal: !this.state.eveningBeverageModal})}>
-                            <Text style={{fontWeight: 'bold', fontSize: 20}}>{this.state.eveningLabel} </Text>
+                            <Text style={{fontWeight: 'bold', fontSize: 20,fontFamily:'Raleway-Bold'}}>{this.state.eveningLabel} </Text>
                         </TouchableOpacity>
-                        <Text style={{fontSize: 20}}>in the evening.</Text>
+                        <Text style={{fontSize: 20,fontFamily:'Raleway-Light'}}>in the evening.</Text>
                     </View>
                 </View>
 
