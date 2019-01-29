@@ -23,6 +23,7 @@ import {NativeRouter, Switch, Route} from 'react-router-native';
 import {createDrawerNavigator, DrawerItems, NavigationActions} from 'react-navigation'
 import {HomeScreen} from "./src/Containers/HomeScreen/HomeScreen";
 import OrderScreen from "./src/Containers/OrderScreen/OrderScreen";
+import PendingOrdersScreen from "./src/Containers/PendingOrdersScreen/PendingOrdersScreen";
 
 export class App extends Component<Props> {
     constructor(props) {
@@ -45,6 +46,7 @@ export class App extends Component<Props> {
                         <Route exact path="/login" component={Login}/>
                         <Route exact path="/homeScreen/:id" component={HomeScreen}/>
                         <Route exact path="/orderScreen" component={OrderScreen}/>
+                        <Route exact path="/pendingOrders" component={PendingOrdersScreen}/>
                     </Switch>
                 </View>
             </NativeRouter>
