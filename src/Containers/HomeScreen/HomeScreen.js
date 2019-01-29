@@ -8,7 +8,8 @@ import {
     Dimensions,
     Image,
     TouchableOpacity,
-    TextInput
+    TextInput,
+    AsyncStorage
 } from 'react-native';
 import {createDrawerNavigator, DrawerActions, DrawerItems} from "react-navigation";
 import Login from "../Login/login";
@@ -19,6 +20,7 @@ import {Card, CardTitle, CardContent, CardAction, CardButton, CardImage} from 'r
 import Modal from "react-native-modal";
 import CustomHeader from "../../Components/Header/Header";
 import CustomModal from "../Modal/Modal";
+import Axios from 'axios';
 
 const user = {
 
@@ -60,6 +62,7 @@ const user = {
             message:'Feeling hungy? Meet me in the Pantry'
         }
 };
+const axios = Axios.create({});
 
 
 export class HomeScreen extends Component {
@@ -68,26 +71,104 @@ export class HomeScreen extends Component {
         this.state = {
             morningBeverageModal: false,
             lunchModal: false,
-            eveningBeverageModal: false
+            eveningBeverageModal: false,
+            beverageDetails:[],
+            morningLabel:'',
+            eveningLabel:'',
         }
     };
 
-    modalHandler=()=>{
+    componentDidMount(){
+        this.getUserId();
+        const beverageURL=`https://h3sp46qcq0.execute-api.us-east-1.amazonaws.com/beverage?user_id=${this.props.match.params.id}`;
+        console.log(beverageURL)
+        axios
+            .get(beverageURL)
+            .then(res=>{
+                switch (res.data[0].morning) {
+                    case 4: this.setState({morningLabel:'Coffee'})
+                        break;
+                    case 3: this.setState({morningLabel:'Tea'})
+                        break;
+                    case 7: this.setState({morningLabel:'Iced Tea'})
+                        break;
+                    case 8: this.setState({morningLabel:'Green Tea'})
+                        break;
+                    default:
+                        break;
+                }
+                switch (res.data[0].evening) {
+                    case 4: this.setState({eveningLabel:'Coffee'})
+                        break;
+                    case 3: this.setState({eveningLabel:'Tea'})
+                        break;
+                    case 7: this.setState({eveningLabel:'Iced Tea'})
+                        break;
+                    case 8: this.setState({eveningLabel:'Green Tea'})
+                        break;
+                }
+
+            })
+            .catch(err=>{
+                alert('something wrong happened')
+            })
+
+    }
+
+    getUserId=(key)= async ()=> {
+        try {
+            let id = await AsyncStorage.getItem('user_details');
+            this.setState({userId:id})
+        } catch (e) {
+            alert(e)
+        }
+    }
+
+  /*  modalHandler=()=>{
         this.setState({
             morningBeverageModal:false,
             lunchModal: false,
             eveningBeverageModal: false
-
         })
+    }*/
+
+  //handles defaults beverages specific to a user
+    handlePreferencesLabels=(mornLabel,evenLabel)=>{
+    console.log(mornLabel+evenLabel)
+        switch (mornLabel) {
+            case 4: this.setState({morningLabel:'Coffee'})
+                break;
+            case 3: this.setState({morningLabel:'Tea'})
+                break;
+            case 7: this.setState({morningLabel:'Iced Tea'})
+                break;
+            case 8: this.setState({morningLabel:'Green Tea'})
+                break;
+            default:
+                break;
+
+        }
+        switch (evenLabel) {
+            case 4: this.setState({eveningLabel:'Coffee'})
+                break;
+            case 3: this.setState({eveningLabel:'Tea'})
+                break;
+            case 7: this.setState({eveningLabel:'Iced Tea'})
+                break;
+            case 8: this.setState({eveningLabel:'Green Tea'})
+                break;
+            default:
+                break;
+
+        }
     }
 
     render() {
-        let pic = {
-            uri: user.evening.url
-        };
         return (
             <View style={styles.container}>
-                <CustomHeader/>
+                <CustomHeader
+                userId={this.props.match.params.id}
+                />
                 <View style={styles.infoContainer}>
                     <View style={{
                         flexDirection: 'row',
@@ -104,7 +185,7 @@ export class HomeScreen extends Component {
                         <Text style={{fontSize: 20}}>You will be served </Text>
                         <TouchableOpacity
                             onPress={() => this.setState({morningBeverageModal: !this.state.morningBeverageModal})}>
-                            <Text style={{fontWeight: 'bold', fontSize: 20}}>Coffee </Text>
+                            <Text style={{fontWeight: 'bold', fontSize: 20}}>{this.state.morningLabel} </Text>
                         </TouchableOpacity>
                         <Text style={{fontSize: 20}}>in the Morning, Lunch at </Text>
                         <TouchableOpacity onPress={() => this.setState({lunchModal: !this.state.lunchModal})}>
@@ -113,39 +194,44 @@ export class HomeScreen extends Component {
                         <Text style={{fontSize: 20}}>and </Text>
                         <TouchableOpacity
                             onPress={() => this.setState({eveningBeverageModal: !this.state.eveningBeverageModal})}>
-                            <Text style={{fontWeight: 'bold', fontSize: 20}}>Tea </Text>
+                            <Text style={{fontWeight: 'bold', fontSize: 20}}>{this.state.eveningLabel} </Text>
                         </TouchableOpacity>
                         <Text style={{fontSize: 20}}>in the evening.</Text>
                     </View>
                 </View>
 
-
-
                 {this.state.morningBeverageModal?
                     <CustomModal
+                        userId={this.props.match.params.id}
+                        morningLabel={this.state.morningLabel}
+                        eveningLabel={this.state.eveningLabel}
                         modalState={this.state.morningBeverageModal}
-                        data={user.morning.beverages}
-                        title={user.morning.title}
-                        message={user.morning.message}
+                        title='Morning Beverage'
+                        message='What would you like to start your day with?'
                         url={user.morning.url}
+                        onPreferencesChange={this.handlePreferencesLabels}
                     />:null}
 
                 {this.state.eveningBeverageModal?
                     <CustomModal
+                        userId={this.props.match.params.id}
+                        morningLabel={this.state.eveningLabel}
+                        eveningLabel={this.state.eveningLabel}
                         modalState={this.state.eveningBeverageModal}
-                        data={user.evening.beverages}
-                        title={user.evening.title}
-                        message={user.evening.message}
+                        title='Evening Beverage'
+                        message='Ahhh! Tiring day. Want some refreshment?'
                         url={user.evening.url}
+                        onPreferencesChange={this.handlePreferencesLabels}
                     />:null}
 
                 {this.state.lunchModal?
                     <CustomModal
+                        userId={this.props.match.params.id}
                         modalState={this.state.lunchModal}
-                        data={user.lunch.timings}
                         title={user.lunch.title}
                         message={user.lunch.message}
                         url={user.lunch.url}
+                        onPreferencesChange={this.handlePreferencesLabels}
                     />:null}
 
 

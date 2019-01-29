@@ -1,43 +1,82 @@
 import React, {Component} from 'react';
-import {StyleSheet, Text, View} from 'react-native';
-import OffCanvasReveal from "react-native-off-canvas-menu/offcanvasReveal";
-import SplashScreen from "../../Containers/Splash Screen/splashScreen";
+import {StyleSheet, Text, View, Image, TouchableOpacity, TouchableHighlight, AsyncStorage} from 'react-native';
+import Modal from 'react-native-modal';
+import { withRouter } from "react-router";
 
-export default class Sidebar extends Component<Props> {
+export class Sidebar extends Component{
     constructor(props) {
         super(props);
         this.state = {
-            menuOpen:false
+
         };
     }
 
-    handleMenu=()=>{
-        const {menuOpen} = this.state
-        this.setState({
-            menuOpen: !menuOpen
-        })
+    componentDidMount(){
+        this.getUserId();
+    }
+
+    getUserId=async ()=>{
+        let id= await AsyncStorage.getItem('user_details')
+        this.setState({userId:id})
+
     }
 
     render() {
         return (
-            <OffCanvasReveal
-                active={this.state.menuOpen}
-                onMenuPress={()=>this.handleMenu()}
-                backgroundColor={'#222222'}
-                menuTextStyles={{color: 'white'}}
-                handleBackPress={true}
-                menuItems={[
-                    {
-                        title: 'Menu 1',
-                        icon: <Icon name="camera" size={35} color='#ffffff' />,
-                    },
-                    {
-                        title: 'Menu 2',
-                        icon: <Icon name="bell" size={35} color='#ffffff' />,
-                        renderScene: <SplashScreen/>
-                    }
-                ]}/>
+                <Modal isVisible={this.props.isSidebarVisible}
+                       backdropOpacity={0.7}
+                       animationInTiming={700}
+                       animationOutTiming={700}
+                       animationIn='slideInLeft'
+                       animationOut='slideOutLeft'
+                       onBackdropPress={() =>this.props.handleSidebarVisibility()}
+                >
+                    <View style={styles.modalContainer}>
+                        <View style={{height:270,justifyContent:'flex-start',flexWrap: 'wrap'}}>
+                            <Image source={require('../../assets/Images/logo.gif')} style={{marginTop:20,marginHorizontal:33,width:190,height:190}}/>
+                            <Text style={{fontSize:16,paddingBottom:10,paddingTop:10,color:'grey',alignSelf:'center',paddingHorizontal:12}}>Get food on your workdesk!</Text>
+                        </View>
+
+                        <TouchableHighlight underlayColor='#adebdd' style={{paddingTop: 5}} onPress={()=>this.props.history.replace(`/homeScreen/${this.state.userId}`)}>
+                                <View style={{flexDirection:'row',height:70,borderTopWidth: 1,borderBottomWidth:1,borderTopColor:'lightgrey',borderBottomColor:'lightgrey'}}>
+                                     <Image source={require('../../assets/Images/home-icon.png')} style={{marginLeft:10,width:55,height:55}}/>
+                                     <Text style={{paddingLeft:20,paddingTop:10,fontSize:20}}>Home</Text>
+                                </View>
+                        </TouchableHighlight>
+
+                        <TouchableHighlight underlayColor='#adebdd' style={{paddingTop: 5}} onPress={()=>this.props.history.replace('/orderScreen')}>
+                            <View style={{flexDirection:'row',height:70,borderBottomWidth:1,borderBottomColor:'lightgrey'}}>
+                                    <Image source={require('../../assets/Images/order-icon.png')} style={{marginLeft:10,width:55,height:55}}/>
+                                    <Text style={{paddingLeft:20,paddingTop:10,fontSize:20}}>Orders</Text>
+                            </View>
+                        </TouchableHighlight>
+
+                        <TouchableHighlight underlayColor='#adebdd' style={{paddingTop: 5}} onPress={()=>alert("Pending orders")}>
+                            <View style={{flexDirection:'row',height:70,borderBottomWidth:1,borderBottomColor:'lightgrey'}}>
+                                <Image source={require('../../assets/Images/pending-orders-icon.png')} style={{marginLeft:10,width:55,height:55}}/>
+                                <Text style={{paddingLeft:20,paddingTop:10,fontSize:20}}>Pending Orders</Text>
+                            </View>
+                        </TouchableHighlight>
+
+                    </View>
+                </Modal>
+
         );
     }
 }
+const styles=StyleSheet.create({
+    modalContainer: {
+        backgroundColor: 'white',
+        // borderRadius: 10,
+        // paddingTop: 10,
+        width:265,
+        marginLeft:-17,
+        // paddingBottom: 10,
+        // paddingHorizontal: 10,
+        height: 615,
+        // justifyContent: 'center'
+
+    },
+});
+export default withRouter(Sidebar);
 

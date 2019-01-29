@@ -26,10 +26,10 @@ export class ModalArticleRow extends Component {
             <View style={styles.container}>
                 <View style={{flexDirection: 'row', width: 280, marginHorizontal: 10, marginBottom: 10}}>
                     <Text style={styles.name}>{this.props.itemName}</Text>
+                    <Text style={{color:'black',fontSize:18,paddingTop:3,paddingRight:2}}>x</Text>
                     <Text style={styles.quantity}>{this.props.quantity}</Text>
-
                     <TouchableOpacity style={{width:20, alignItems: 'center',paddingTop:2}} onPress={() => this.props.onDelete()}>
-                        <Text style={{fontSize:20,fontWeight:'bold'}}>-</Text>
+                        <Image source={require('../../../assets/Images/trash-can-black.png')} style={{width:24,height:24,marginLeft:20}}/>
                     </TouchableOpacity>
                 </View>
             </View>
@@ -42,6 +42,7 @@ const styles = StyleSheet.create({
         flexDirection: 'row',
         // backgroundColor:'red',
         alignItems: 'center',
+        marginBottom: 10
         // marginVertical: 20,
         // width: 300
     },

@@ -2,7 +2,8 @@ import React, {Component} from 'react';
 import {StyleSheet, Text, View, Image} from 'react-native';
 
 
-const {uri}='../../assets/Images/logo.gif'
+const {uri} = '../../assets/Images/logo.gif'
+
 export class SplashScreen extends Component {
     constructor(props) {
         super(props)
@@ -14,8 +15,9 @@ export class SplashScreen extends Component {
     render() {
 
         return (
-            <Image source={require('../../assets/Images/logo.gif')} style={styles.imgContainer}/>
-
+            <View style={{backgroundColor: 'white',width: '100%',height: '100%'}}>
+                <Image source={require('../../assets/Images/logo.gif')} style={styles.imgContainer}/>
+            </View>
 
         );
     }
@@ -23,14 +25,16 @@ export class SplashScreen extends Component {
 
 const styles = StyleSheet.create({
     container: {
-        flex: 1,
     },
     imgContainer: {
         // backgroundColor:'black',
-        alignItems:'center',
-        marginLeft:20,
-        width:'50%',
-        height:'50%',
+        // alignItems: 'center',
+        marginLeft: 13,
+        marginTop:'35%',
+        width: 320,
+        height: 320,
+        // justifyContent: 'center',
+        alignSelf: 'center',
 
 
     },

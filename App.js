@@ -43,7 +43,7 @@ export class App extends Component<Props> {
                     <Switch>
                         <Route exact path="/" component={SplashScreen}/>
                         <Route exact path="/login" component={Login}/>
-                        <Route exact path="/homeScreen" component={HomeScreen}/>
+                        <Route exact path="/homeScreen/:id" component={HomeScreen}/>
                         <Route exact path="/orderScreen" component={OrderScreen}/>
                     </Switch>
                 </View>

@@ -3,7 +3,10 @@ import {Image, StyleSheet, Text, TouchableOpacity, View} from 'react-native';
 import { Container, Header, Left, Body, Right, Button, Icon, Title } from 'native-base';
 import Modal from "react-native-modal";
 import { Dropdown } from 'react-native-material-dropdown';
+import Axios from 'axios';
+const beverageURL='https://h3sp46qcq0.execute-api.us-east-1.amazonaws.com/beverage'
 
+const axios = Axios.create({});
 export class CustomModal extends Component{
     constructor(props){
         super(props);
@@ -12,8 +15,80 @@ export class CustomModal extends Component{
         }
     }
 
+
+    //handles preferences setting PATCH API
+    handlePreferences=(value)=> {
+         this.setState({morningPref:4});
+        this.setState({eveningPref:4});
+        if(this.props.title==='Morning Beverage')
+        {
+            switch(value)
+            {
+                case 'Coffee':
+                    this.setState({morningPref:4});
+                    break;
+                case 'Tea':
+                    this.setState({morningPref:3});
+                    break;
+                case 'Iced Tea':
+                    this.setState({morningPref:7});
+                    break;
+                case 'Green Tea':
+                    this.setState({morningPref:8});
+                    break;
+                default:
+                    break;
+            }
+        }
+        else{
+            switch(value)
+            {
+                case 'Coffee':
+                    this.setState({eveningPref:4});
+                    break;
+                case 'Tea':
+                    this.setState({eveningPref:3});
+                    break;
+                case 'Iced Tea':
+                    this.setState({eveningPref:7});
+                    break;
+                case 'Green Tea':
+                    this.setState({eveningPref:8});
+                    break;
+                default:
+                    break;
+
+            }
+        }
+
+        const obj= {
+            user_id: this.props.userId,
+            morning: this.state.morningPref,
+            evening: this.state.eveningPref
+        }
+
+        axios
+            .patch(beverageURL,obj)
+            .then(res=>{
+                this.props.onPreferencesChange(this.state.morningPref,this.state.eveningPref)
+                this.setState({modalState:false})
+            })
+            .catch(err=>{
+                console.log(err.response)
+            })
+    }
+
+
     render(){
-        let data = this.props.data
+        let data = [
+            {
+            value:'Coffee'}
+            ,
+            {value:'Tea'}
+            , {
+            value:'Iced Tea'
+            },
+        ];
         return(
             <View style={styles.container}>
                 <Modal isVisible={this.state.modalState}
@@ -34,7 +109,11 @@ export class CustomModal extends Component{
                             label='Set Preference'
                             dropdownPosition={-2}
                             data={data}
+                            // value={this.state.value}
+                            onChangeText={(value)=>this.handlePreferences(value)}
                         />
+                        {/*<TouchableOpacity onPress={()=alert}>
+                        </TouchableOpacity>*/}
                     </View>
 
                 </Modal>

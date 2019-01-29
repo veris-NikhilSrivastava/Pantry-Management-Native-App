@@ -6,6 +6,7 @@ import {
     FlatList,
     ScrollView,
     AsyncStorage,
+    Image,
     Dimensions,
     TouchableOpacity, TextInput, TouchableWithoutFeedback
 } from 'react-native';
@@ -14,51 +15,94 @@ import NumericInput from 'react-native-numeric-input';
 import {ArticleRow} from "./ArticleRow/ArticleRow";
 import Modal from "react-native-modal";
 import {ModalArticleRow} from "./ModalArticlesRow/ModalArticleRow";
+import Axios from 'axios';
+import Toast, {DURATION} from 'react-native-easy-toast'
 
+
+const inventoryURL='https://2kyff8ynsi.execute-api.us-east-1.amazonaws.com/inventory';
+const orderURL='https://gthxv5x713.execute-api.us-east-1.amazonaws.com/orders';
+
+const axios=Axios.create({});
 export class OrderScreen extends Component {
     constructor(props) {
         super(props);
         this.state = {
             value: 0,
             itemArray: [],
-            modalClosed:false
-
+            modalClosed: false,
+            inventoryData:[],
+            updatedQty:0,
+            stockOutFlag:false
         }
     }
 
-    /* async componentDidMount() {
-         const users = await ajax.fetchUsers();
-         this.setState({users});
+    //getting user id from Async storage
+    getUserId=async ()=>{
+        let id= await AsyncStorage.getItem('user_details')
+        this.setState({userId:id})
+
+    }
+
+    componentDidMount(){
+        this.getUserId();
+        this.getInventoryData();
+    }
+
+    getInventoryData=()=>{
+        axios
+            .get(inventoryURL)
+            .then(res=>{
+                this.setState({inventoryData:res.data})
+            })
+            .catch(err=>{
+                alert("Oops! Something went wrong!")
+            })
+    }
+
+    componentDidUpdate(){
+        console.log('uodates');
+        /*axios
+            .get(inventoryURL)
+            .then(res=>{
+                this.setState({inventoryData:res.data})
+            })
+            .catch(err=>{
+                alert("Oops! Something went wrong!")
+            })*/
+
+    }
+
+    /* saveProductDetails = () => {
+         AsyncStorage.setItem('items', JSON.stringify(this.state.itemArray))
+         this.display(key)
      }*/
 
-    saveProductDetails = () => {
-        AsyncStorage.setItem('items', JSON.stringify(this.state.itemArray))
-        this.display(key)
-    }
-    handleChangeProductQuantity = (quantity,key,name) => {
+    //handles product quantity change and updates it to Async
+    handleChangeProductQuantity = (quantity, key, name) => {
         let flag = 0;
         let arr = this.state.itemArray;
         const obj = {
-            itemId: key,
-            itemName:name,
-            quantityOrdered: quantity
+            item_id: ++key,
+            item_name: name,
+            qty: quantity
         };
         if (arr.length === 0) {
-            arr.push(obj);
+            arr.unshift(obj);
         } else {
             arr.map((item, index) => {
-                if (item.itemId === key) {
-                    item.quantityOrdered = quantity
+                if (item.item_id === key) {
+                    item.qty = quantity
                     flag = 1
                 }
             });
             if (flag === 1)
                 null;
             else
-                arr.push(obj)
+                arr.unshift(obj)
         }
 
-        this.setState({itemArray: arr}, this.saveProductDetails);
+        this.setState({itemArray: arr});
+        console.log(this.state.itemArray)
         /*// console.log(this.state.itemArray)
         // arr[key]['quantityOrdered']=quantity;
 
@@ -71,12 +115,36 @@ export class OrderScreen extends Component {
 
         // arr[obj.itemId]['quantityOrdered']=quantity;*/
     }
+
+    //handles item deletion from cart
     handleDeleteItems = (key) => {
         let arr = this.state.itemArray;
-        arr.splice(key, 1);
+        arr.map((item,index)=>{
+            console.log("key is below")
+            console.log(key)
+            console.log("index is below")
+            console.log(index)
+
+            if (index === key)
+            {
+                if(item.qty>1)
+                {
+                    console.log("im here")
+                    --item.qty
+                }
+                else
+                {
+                    console.log("im splice")
+                    arr.splice(key, 1);
+                }
+            }
+        })
+
         this.setState({itemArray: arr}, this.saveProductDetails);
-        if(this.state.itemArray.length===0)
-            this.setState({isModalVisible:false})
+        console.log("deleted below")
+        console.log(this.state.itemArray)
+        if (this.state.itemArray.length === 0)
+            this.setState({isModalVisible: false})
     };
 
     display = (key) = async () => {
@@ -85,80 +153,77 @@ export class OrderScreen extends Component {
             let parsed = JSON.parse(user)
             /*alert(parsed.itemId)
             console.log("parsed ")
-            console.log(JSON.parse(user));*/
+            */
+            console.log("ASyn");
+            console.log(JSON.parse(user));
         } catch (e) {
             alert(e)
         }
     };
 
+    //handle place order API
+    placeOrder=()=>{
+
+        let data=this.state.itemArray;
+        const orderData={
+            user_id:this.state.userId,
+            orderItems:data
+        };
+        axios
+            .post(orderURL,orderData)//4
+            .then(res=>{
+                alert('order Placed');
+                this.getInventoryData();
+                this.setState({isModalVisible:false})
+            })
+            .catch(err=>{
+                console.log(err.response.data);
+                this.getInventoryData();
+                err.response.data.map((responseItem,key)=>{
+                    if(responseItem.qty===0){
+                        this.state.itemArray.map((item,key)=>{
+                            if(responseItem.item_name===item.item_name)
+                            {
+                                // let updatedQuantity=responseItem.qty;
+                                this.setState({updatedQty:responseItem.qty,stockOutFlag:true})
+                                // console.log(item.updatedQty)
+                            }
+                        })
+                    }
+                })
+                // this.setState({modQuant:{updatedQuantity})
+                console.log(this.state.updatedQty)
+                console.log("qty above")
+            }
+            )
+    }
+
 
     render() {
-        let data = [
-            {
-                "id": 1,
-                "name": "Chips",
-                "quantity": 3
-            },
-            {
-                "id": 2,
-                "name": "Bourbon",
-                "quantity": 5
-            },
-            {
-                "id": 3,
-                "name": "Masala Peanuts",
-                "quantity": 6
-            },
-            {
-                "id": 4,
-                "name": "Poha",
-                "quantity": 2
-            },
-            {
-                "id": 5,
-                "name": "Maggi",
-                "quantity": 9
-            },
-            {
-                "id": 6,
-                "name": "Juice",
-                "quantity": 12
-            },
-            {
-                "id": 7,
-                "name": "Juice",
-                "quantity": 12
-            },
-            {
-                "id": 8,
-                "name": "Juice",
-                "quantity": 12
-            },
-            {
-                "id": 9,
-                "name": "Juice",
-                "quantity": 12
-            },
-
-        ];
+        let data = this.state.inventoryData;
+        console.log("inventory is")
+        console.log(data)
         return (
             <View style={styles.container}>
                 <CustomHeader/>
-                <View style={{borderRadius:10,borderColor:'lightgrey',borderBottomWidth:2,borderTopWidth:2,borderLeftWidth:2,borderRightWidth:2,height: 390,marginTop:30}}>
+                <Text style={{color:"grey",marginTop:20,fontSize:35, textAlign:'center'}}>Inventory</Text>
+                <View style={{height: 390, marginTop: 10}}>
+                    <Text style={{color:"grey",marginTop:50,fontSize:35, textAlign:'center'}}>Sorry! People are very hungry. We'll restock the items soon</Text>
                     <ScrollView
                         onContentSizeChange={this.onContentSizeChange}
                     >
                         {
                             data.map((item, key) => (
-                                <ArticleRow
-                                    modalClosed={this.state.modalClosed}
-                                    modValue={this.state.value}
-                                    key={key}
-                                    index={key}
-                                    itemName={item.name}
-                                    onChange={this.handleChangeProductQuantity}
-                                />
-
+                                    item.qty?
+                                        <ArticleRow
+                                            modalClosed={this.state.modalClosed}
+                                            modValue={this.state.value}
+                                            key={key}
+                                            maxQuantity={item.qty}
+                                            index={key}
+                                            itemName={item.item_name}
+                                            onChange={this.handleChangeProductQuantity}
+                                        />:null
                             ))
                         }
                     </ScrollView>
@@ -170,26 +235,50 @@ export class OrderScreen extends Component {
                        animationOutTiming={700}
                        animationIn='slideInDown'
                        animationOut='slideOutUp'
-                       onBackdropPress={() => this.setState({ isModalVisible: false,modalClosed:!this.state.modalClosed})}
+                       onBackdropPress={() => this.setState({
+                           isModalVisible: false,
+                           modalClosed: !this.state.modalClosed
+                       })}
                 >
                     <View style={styles.modalContainer}>
-                    {this.state.itemArray.map((item,key)=>(
-                        <ModalArticleRow
-                            key={key}
-                            onDelete={()=>this.handleDeleteItems(key)}
-                            itemName={item.itemName}
-                            quantity={item.quantityOrdered}
-                            index={key}
-                        />
+                        <Text style={{fontSize:30,textAlign:'center',paddingBottom: 20}}>Order Summary</Text>
+                        <Image source={require('../../assets/Images/empty-cart.jpg')}style={{width:160,height:100,marginHorizontal:80,marginBottom:10}}/>
+                        <ScrollView>
+                            {this.state.itemArray.map((item, key) => (
+                                <ModalArticleRow
+                                    key={key}
+                                    onDelete={() => this.handleDeleteItems(key)}
+                                    itemName={item.item_name}
+                                    quantity={this.state.stockOutFlag?this.state.updatedQty:item.qty}
+                                    index={key}
+                                />
 
-                    ))}
-                        <TouchableOpacity style={{flexDirection:'row',backgroundColor:'#24973e',width:250,marginHorizontal:30,marginTop:40,height:50,borderRadius:10}} onPress={()=>alert('order placed')}>
-                            <Text style={{textAlign:'center',fontSize: 23,paddingVertical: 8,paddingHorizontal: 50}}>PLACE ORDER</Text>
+                            ))}
+                        </ScrollView>
+                        <TouchableOpacity style={{
+                            flexDirection: 'row',
+                            backgroundColor: 'rgba(210,38,49,0.7)',
+                            width: 250,
+                            marginHorizontal: 30,
+                            marginVertical: 10,
+                            height: 50,
+                            borderRadius: 10
+                        }} onPress={() => this.placeOrder()}>
+                            <Text style={{textAlign: 'center', fontSize: 23, paddingVertical: 8, paddingHorizontal: 50}}>PLACE
+                                ORDER</Text>
                         </TouchableOpacity>
                     </View>
                 </Modal>
-                <TouchableOpacity style={{flexDirection:'row',backgroundColor:'#24973e',width:180,marginTop: 20,height:50,borderRadius: 10}} onPress={()=>this.setState({isModalVisible:!this.state.isModalVisible})}>
-                    <Text style={{textAlign:'center',fontSize: 23,paddingVertical: 8,paddingHorizontal: 40}}>View Cart</Text>
+                <TouchableOpacity style={{
+                    flexDirection: 'row',
+                    backgroundColor: '#24973e',
+                    width: 180,
+                    // marginTop: 20,
+                    height: 50,
+                    borderRadius: 10
+                }} onPress={() => this.setState({isModalVisible: !this.state.isModalVisible})}>
+                    <Text style={{textAlign: 'center', fontSize: 23, paddingVertical: 8, paddingHorizontal: 40}}>View
+                        Cart</Text>
                 </TouchableOpacity>
             </View>
         );
@@ -214,7 +303,7 @@ const styles = StyleSheet.create({
         flexDirection: 'row',
         alignItems: 'center'
     },
-       name: {
+    name: {
         fontFamily: 'Verdana',
         fontSize: 18
     },
@@ -222,12 +311,12 @@ const styles = StyleSheet.create({
         color: 'red'
     },
     modalContainer: {
-        backgroundColor: 'lightblue',
+        backgroundColor: 'white',
         borderRadius: 10,
-        paddingTop: 80,
+        paddingTop: 10,
         // paddingBottom: 10,
         paddingHorizontal: 10,
-        height: '78%',
+        height: '70%',
         marginTop: 18,
         justifyContent: 'center'
 

@@ -11,10 +11,9 @@ export class ArticleRow extends Component {
             value: 0,
             pressed:false
         }
-        console.log(this.props.modValue)
-        console.log(this.props.modalClosed)
     }
 
+    //handle quantity change
     handleChange=(value)=>{
         this.setState({pressed:true})
         let quantCount=value;
@@ -30,9 +29,10 @@ export class ArticleRow extends Component {
                     </View>
                     <View style={{flexDirection: 'column'}}>
                         <NumericInput
-                            value={this.props.modalClosed?this.props.intValue:this.state.value}
+                            value={this.state.value}
                             onChange={value => this.handleChange(value)}
                             totalWidth={90}
+                            maxValue={this.props.maxQuantity}
                             initValue={this.state.value}
                             totalHeight={30}
                             iconSize={25}
