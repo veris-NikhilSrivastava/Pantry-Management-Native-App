@@ -1,8 +1,5 @@
 import React,{Component} from 'react';
-import {Image, StyleSheet, Text, TouchableOpacity, View,ActivityIndicator} from 'react-native';
-import { Container, Header, Left, Body, Right, Button, Icon, Title } from 'native-base';
-import { withRouter } from "react-router";
-import Sidebar from "../Sidebar/sidebar";
+import {View,ActivityIndicator} from 'react-native';
 
 export class Spinner extends Component{
     constructor(props) {
@@ -11,27 +8,12 @@ export class Spinner extends Component{
             isSidebarVisible: false
         };
     }
-
-    sidebarVisibility=()=>{
-        this.setState({isSidebarVisible:false})
-        console.log('sidebarFalse')
-    }
-
     render(){
         return(
-            <View style={styles.container}>
-                                <ActivityIndicator size={100} color="rgba(61, 160, 4,0.5)"/>
+            <View style={{backgroundColor:'rgba(250,250,250,0.8)',zIndex:1000,top:0,left:0,position:'absolute',height:'120%',width:'100%'}}>
+                <ActivityIndicator size={80} style={{position: 'absolute',alignSelf: 'center',justifyContent:'center',marginTop: '80%'}} color='rgb(0,0,0)'/>
             </View>
         );
     }
 }
-const styles=StyleSheet.create({
-    container: {
-        width:'100%',
-        height:'100%',
-        backgroundColor:'rgba(255,255,255,0.4)',
-    },
-
-});
-
 export default Spinner;
