@@ -3,12 +3,10 @@ import {
     StyleSheet,
     Text,
     View,
-    FlatList,
     ScrollView,
     AsyncStorage,
     Image,
-    Dimensions,
-    TouchableOpacity, TextInput, TouchableWithoutFeedback
+    TouchableOpacity,
 } from 'react-native';
 import CustomHeader from "../../Components/Header/Header";
 import NumericInput from 'react-native-numeric-input';
@@ -182,9 +180,6 @@ export class OrderScreen extends Component {
                         })
                     }
                 })
-                // this.setState({modQuant:{updatedQuantity})
-                console.log(this.state.updatedQty)
-                console.log("qty above")
             }
             )
     }
@@ -198,9 +193,9 @@ export class OrderScreen extends Component {
             <View style={styles.container}>
                 {this.state.isLoading?<Spinner/>:null}
                 <CustomHeader/>
-                <Text style={{fontFamily:'Raleway-Regular',color:"grey",marginTop:20,fontSize:45, textAlign:'center'}}>Inventory</Text>
-                <View style={{height: 390, marginTop: 10}}>
-                    {data.length?<Text style={{fontFamily:'Raleway-Light',color:"grey",marginTop:70,marginLeft:5,marginRight:5,fontSize:30,textAlign:'center'}}>Sorry! People are very hungry. We'll restock the items soon</Text>:null}
+                <Text style={{fontFamily:'Raleway-Regular',color:"grey",marginTop:10,fontSize:45, textAlign:'center'}}>Inventory</Text>
+                <View style={{height: 390, marginTop: 7}}>
+                    {data.length===0?<Text style={{fontFamily:'Raleway-Light',color:"grey",marginTop:70,marginLeft:5,marginRight:5,fontSize:28,textAlign:'center'}}>Sorry! People are very hungry. We'll restock the items soon</Text>:null}
                     <ScrollView
                         onContentSizeChange={this.onContentSizeChange}
                     >
@@ -265,11 +260,11 @@ export class OrderScreen extends Component {
                     flexDirection: 'row',
                     backgroundColor: '#24973e',
                     width: 180,
-                    // marginTop: 20,
+                    marginTop: 15,
                     height: 50,
                     borderRadius: 10
                 }} onPress={() => this.setState({isModalVisible: !this.state.isModalVisible})}>
-                    <Text style={{textAlign: 'center', fontSize: 23, paddingVertical: 8, paddingHorizontal: 40}}>View
+                    <Text style={{textAlign: 'center', fontSize: 23, paddingVertical: 10, paddingHorizontal: 40}}>View
                         Cart</Text>
                 </TouchableOpacity>
             </View>

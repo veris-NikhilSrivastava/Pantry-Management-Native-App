@@ -79,7 +79,7 @@ const styles = StyleSheet.create({
     container: {
         flex: 1,
         alignItems: 'center',
-        marginVertical: 20,
+        marginVertical  : 20,
         // backgroundColor: 'red',
         width: 300
     },
