@@ -51,7 +51,7 @@ export class Sidebar extends Component{
                             </View>
                         </TouchableHighlight>
 
-                        <TouchableHighlight underlayColor='#adebdd' style={{paddingTop: 5}} onPress={()=>this.props.history.replace('/pendingOrders')}>
+                        <TouchableHighlight underlayColor='#adebdd' style={{paddingTop: 5}} onPress={()=>this.props.history.replace(`/pendingOrders/${this.state.userId}`)}>
                             <View style={{flexDirection:'row',height:70,borderBottomWidth:1,borderBottomColor:'lightgrey'}}>
                                 <Image source={require('../../assets/Images/pending-orders-icon.png')} style={{marginLeft:10,width:55,height:55}}/>
                                 <Text style={{paddingLeft:20,paddingTop:10,fontSize:20,fontFamily:'Raleway-Light'}}>Pending Orders</Text>

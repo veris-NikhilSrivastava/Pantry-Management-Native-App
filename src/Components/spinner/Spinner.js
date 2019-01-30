@@ -1,6 +1,7 @@
 import React,{Component} from 'react';
 import {View,ActivityIndicator} from 'react-native';
 
+
 export class Spinner extends Component{
     constructor(props) {
         super(props);
@@ -16,4 +17,6 @@ export class Spinner extends Component{
         );
     }
 }
+
+
 export default Spinner;

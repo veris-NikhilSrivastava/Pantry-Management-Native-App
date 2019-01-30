@@ -1,6 +1,6 @@
 import React,{Component} from 'react';
 import {Image, StyleSheet, Text, TouchableOpacity, View} from 'react-native';
-import { Container, Header, Left, Body, Right, Button, Icon, Title } from 'native-base';
+import {Header, Left,Right} from 'native-base';
 import { withRouter } from "react-router";
 import Sidebar from "../Sidebar/sidebar";
 import Spinner from "../spinner/Spinner";
