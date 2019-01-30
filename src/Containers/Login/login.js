@@ -380,7 +380,7 @@ const styles = StyleSheet.create({
         borderRadius: 10,
     },
     buttonContainer: {
-        backgroundColor: '#72c585', //72c585 disbled249e40
+        backgroundColor: '#606e34', //72c585 disbled249e40
         paddingVertical: 15,
         borderRadius: 10,
         height:65,

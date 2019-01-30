@@ -14,43 +14,43 @@ import Spinner from "../../Components/spinner/Spinner";
 
 const user = {
 
-        morning:{
-            beverages:[
-                {
-                value:'Coffee'
-            },{
-                 value:'Tea'
-                }
-            ],
-            url:require('../../assets/Images/morning-beverage.png'),
-            title:'Morning Beverage',
-            message:'What would you like to start your day with?'
-        },
-        evening:{
-            beverages:[{
-                value:'Tea'
-            },{
-                value:'Coffee'
-                }
-                ],
-            url:require('../../assets/Images/evening-beverage.jpg'),
-            title:'Evening Beverage',
-            message:'Ahhh! Tiring day. Want some refreshment?'
-
-        },
-        lunch: {
-            timings:[
-                {
-                    value:'1:30'
-                },
-                {
-                    value:'2:30'
-                }
-            ],
-            title:'Lunch Slot',
-            url:require('../../assets/Images/lunch-slot.jpg'),
-            message:'Feeling hungy? Meet me in the Pantry'
+    morning: {
+        beverages: [
+            {
+                value: 'Coffee'
+            }, {
+                value: 'Tea'
+            }
+        ],
+        url: require('../../assets/Images/morning-beverage.png'),
+        title: 'Morning Beverage',
+        message: 'What would you like to start your day with?'
+    },
+    evening: {
+        beverages: [{
+            value: 'Tea'
+        }, {
+            value: 'Coffee'
         }
+        ],
+        url: require('../../assets/Images/evening-beverage.jpg'),
+        title: 'Evening Beverage',
+        message: 'Ahhh! Tiring day. Want some refreshment?'
+
+    },
+    lunch: {
+        timings: [
+            {
+                value: '1:30'
+            },
+            {
+                value: '2:30'
+            }
+        ],
+        title: 'Lunch Slot',
+        url: require('../../assets/Images/lunch-slot.jpg'),
+        message: 'Feeling hungy? Meet me in the Pantry'
+    }
 };
 
 /*
@@ -67,112 +67,129 @@ export class HomeScreen extends Component {
             morningBeverageModal: false,
             lunchModal: false,
             eveningBeverageModal: false,
-            beverageDetails:[],
-            morningLabel:'',
-            eveningLabel:'',
+            beverageDetails: [],
+            morningLabel: '',
+            eveningLabel: '',
         }
     };
-    handleBeveragesAPI=()=>{
-        const beverageURL=`https://h3sp46qcq0.execute-api.us-east-1.amazonaws.com/beverage?user_id=${this.props.match.params.id}`;
-        // console.log(beverageURL)
+
+    handleBeveragesAPI = () => {
+        const beverageURL = `https://h3sp46qcq0.execute-api.us-east-1.amazonaws.com/beverage?user_id=${this.props.match.params.id}`;
         axios
             .get(beverageURL)
-            .then(res=>{
+            .then(res => {
                 switch (res.data[0].morning) {
-                    case 4: this.setState({morningLabel:'Coffee'})
+                    case 4:
+                        this.setState({morningLabel: 'Coffee'})
                         break;
-                    case 3: this.setState({morningLabel:'Tea'})
+                    case 3:
+                        this.setState({morningLabel: 'Tea'})
                         break;
-                    case 7: this.setState({morningLabel:'Iced Tea'})
+                    case 7:
+                        this.setState({morningLabel: 'Iced Tea'})
                         break;
-                    case 8: this.setState({morningLabel:'Green Tea'})
+                    case 8:
+                        this.setState({morningLabel: 'Green Tea'})
                         break;
                     default:
                         break;
                 }
                 switch (res.data[0].evening) {
-                    case 4: this.setState({eveningLabel:'Coffee'})
+                    case 4:
+                        this.setState({eveningLabel: 'Coffee'})
                         break;
-                    case 3: this.setState({eveningLabel:'Tea'})
+                    case 3:
+                        this.setState({eveningLabel: 'Tea'})
                         break;
-                    case 7: this.setState({eveningLabel:'Iced Tea'})
+                    case 7:
+                        this.setState({eveningLabel: 'Iced Tea'})
                         break;
-                    case 8: this.setState({eveningLabel:'Green Tea'})
+                    case 8:
+                        this.setState({eveningLabel: 'Green Tea'})
                         break;
                 }
-                this.setState({isLoading:false})
+                this.setState({isLoading: false})
             })
-            .catch(err=>{
+            .catch(err => {
                 alert('something wrong happened')
             })
     }
-
-    componentDidMount(){
-        this.setState({isLoading:true})
-        this.getUserId();
-        this.handleBeveragesAPI();
-        const slotsURL=`https://4np5t34b52.execute-api.us-east-1.amazonaws.com/slots?user_id=${this.props.match.params.id}`;
-        console.log(slotsURL)
+    handleLunchSlots = () => {
+        const slotsURL = `https://4np5t34b52.execute-api.us-east-1.amazonaws.com/slots?user_id=${this.props.match.params.id}`;
         axios
             .get(slotsURL)
-            .then(res=>{
-                    console.log(res.data)
-                    this.setState({lunchSlotsData:res.data})
-                switch(res.data.selected){
+            .then(res => {
+                this.setState({lunchSlotsData: res.data})
+                switch (res.data.selected) {
                     case 0:
-                        this.setState({lunchSlot:'1:30-2:00'})
+                        this.setState({lunchSlot: '1:30-2:00'})
                         break;
                     case 1:
-                        this.setState({lunchSlot:'2:00-2:30'})
+                        this.setState({lunchSlot: '2:00-2:30'})
                         break;
                     case 2:
-                        this.setState({lunchSlot:'2:30-3:00'})
+                        this.setState({lunchSlot: '2:30-3:00'})
                         break;
                     case 3:
-                        this.setState({lunchSlot:'3:00-3:30'})
+                        this.setState({lunchSlot: '3:00-3:30'})
                         break;
                     default:
-                        this.setState({lunchSlot:'Select'})
+                        this.setState({lunchSlot: 'Select'})
 
                 }
-                    // console.log(res.data.lunchSlots)
             })
+
+    }
+
+    componentDidMount() {
+        this.setState({isLoading: true})
+        this.getUserId();
+        this.handleBeveragesAPI();
+        this.handleLunchSlots();
 
 
     }
 
-    getUserId=(key)= async ()=> {
+    getUserId = (key) = async () => {
         try {
             let id = await AsyncStorage.getItem('user_details');
-            this.setState({userId:id})
+            this.setState({userId: id})
         } catch (e) {
             alert(e)
         }
     }
 
-  //handles defaults beverages specific to a user
-    handlePreferencesLabels=(mornLabel,evenLabel)=>{
+    //handles defaults beverages specific to a user
+    handlePreferencesLabels = (mornLabel, evenLabel) => {
         switch (mornLabel) {
-            case 4: this.setState({morningLabel:'Coffee',isLoading:false})
+            case 4:
+                this.setState({morningLabel: 'Coffee', isLoading: false})
                 break;
-            case 3: this.setState({morningLabel:'Tea',isLoading:false})
+            case 3:
+                this.setState({morningLabel: 'Tea', isLoading: false})
                 break;
-            case 7: this.setState({morningLabel:'Iced Tea',isLoading:false})
+            case 7:
+                this.setState({morningLabel: 'Iced Tea', isLoading: false})
                 break;
-            case 8: this.setState({morningLabel:'Green Tea',isLoading:false})
+            case 8:
+                this.setState({morningLabel: 'Green Tea', isLoading: false})
                 break;
             default:
                 break;
 
         }
         switch (evenLabel) {
-            case 4: this.setState({eveningLabel:'Coffee',isLoading:false})
+            case 4:
+                this.setState({eveningLabel: 'Coffee', isLoading: false})
                 break;
-            case 3: this.setState({eveningLabel:'Tea',isLoading:false})
+            case 3:
+                this.setState({eveningLabel: 'Tea', isLoading: false})
                 break;
-            case 7: this.setState({eveningLabel:'Iced Tea',isLoading:false})
+            case 7:
+                this.setState({eveningLabel: 'Iced Tea', isLoading: false})
                 break;
-            case 8: this.setState({eveningLabel:'Green Tea',isLoading:false})
+            case 8:
+                this.setState({eveningLabel: 'Green Tea', isLoading: false})
                 break;
             default:
                 break;
@@ -180,15 +197,19 @@ export class HomeScreen extends Component {
         }
     }
 
-    handleSlotBooking=(slotId)=>{
+    handleSlotBooking = (slotId) => {
         switch (slotId) {
-            case 0:this.setState({lunchSlot:'1:30-2:30'})
+            case 0:
+                this.setState({lunchSlot: '1:30-2:30'})
                 break;
-            case 1:this.setState({lunchSlot:'2:00-2:30'})
+            case 1:
+                this.setState({lunchSlot: '2:00-2:30'})
                 break;
-            case 2:this.setState({lunchSlot:'2:30-3:00'})
+            case 2:
+                this.setState({lunchSlot: '2:30-3:00'})
                 break;
-            case 3:this.setState({lunchSlot:'3:00-3:30'})
+            case 3:
+                this.setState({lunchSlot: '3:00-3:30'})
                 break;
 
 
@@ -198,9 +219,9 @@ export class HomeScreen extends Component {
     render() {
         return (
             <View style={styles.container}>
-                {this.state.isLoading?<Spinner/>:null}
+                {this.state.isLoading ? <Spinner/> : null}
                 <CustomHeader
-                userId={this.props.match.params.id}
+                    userId={this.props.match.params.id}
                 />
                 <View style={styles.infoContainer}>
                     <View style={{
@@ -214,59 +235,77 @@ export class HomeScreen extends Component {
                                style={{width: 150, height: 150}}/>
                     </View>
 
-                    <View style={{flexDirection: 'row', flexWrap: 'wrap',textAlign:'center', marginLeft: 10}}>
-                        <Text style={{fontSize: 20,textAlign:'center',fontFamily:'Raleway-Light'}}>You will be served </Text>
+                    <View style={{flexDirection: 'row', flexWrap: 'wrap', textAlign: 'center', marginLeft: 10}}>
+                        <Text style={{fontSize: 20, textAlign: 'center', fontFamily: 'Raleway-Light'}}>You will be
+                            served </Text>
                         <TouchableOpacity
                             onPress={() => this.setState({morningBeverageModal: !this.state.morningBeverageModal})}>
-                            <Text style={{fontWeight: 'bold', fontSize: 20,fontFamily:'Raleway-Bold'}}>{this.state.morningLabel} </Text>
+                            <Text style={{
+                                fontWeight: 'bold',
+                                fontSize: 20,
+                                fontFamily: 'Raleway-Bold'
+                            }}>{this.state.morningLabel} </Text>
                         </TouchableOpacity>
-                        <Text style={{fontSize: 20,fontFamily:'Raleway-Light'}}>in the Morning, Lunch at </Text>
+                        <Text style={{fontSize: 20, fontFamily: 'Raleway-Light'}}>in the Morning, Lunch at </Text>
                         <TouchableOpacity onPress={() => this.setState({lunchModal: !this.state.lunchModal})}>
-                            <Text style={{fontWeight: 'bold', fontSize: 20,fontFamily:'Raleway-Bold'}}>{this.state.lunchSlot} </Text>
+                            <Text style={{
+                                fontWeight: 'bold',
+                                fontSize: 20,
+                                fontFamily: 'Raleway-Bold'
+                            }}>{this.state.lunchSlot} </Text>
                         </TouchableOpacity>
-                        <Text style={{fontSize: 20,fontFamily:'Raleway-Light'}}>and </Text>
+                        <Text style={{fontSize: 20, fontFamily: 'Raleway-Light'}}>and </Text>
                         <TouchableOpacity
                             onPress={() => this.setState({eveningBeverageModal: !this.state.eveningBeverageModal})}>
-                            <Text style={{fontWeight: 'bold', fontSize: 20,fontFamily:'Raleway-Bold'}}>{this.state.eveningLabel} </Text>
+                            <Text style={{
+                                fontWeight: 'bold',
+                                fontSize: 20,
+                                fontFamily: 'Raleway-Bold'
+                            }}>{this.state.eveningLabel} </Text>
                         </TouchableOpacity>
-                        <Text style={{fontSize: 20,fontFamily:'Raleway-Light'}}>in the evening.</Text>
+                        <Text style={{fontSize: 20, fontFamily: 'Raleway-Light'}}>in the evening.</Text>
                     </View>
                 </View>
 
-                {this.state.morningBeverageModal?
+                {this.state.morningBeverageModal ?
                     <CustomModal
                         userId={this.props.match.params.id}
+                        isBeverage={true}
                         morningLabel={this.state.morningLabel}
                         eveningLabel={this.state.eveningLabel}
                         modalState={this.state.morningBeverageModal}
                         title='Morning Beverage'
+                        lunchSlotsData={this.state.lunchSlotsData}
                         message='What would you like to start your day with?'
                         url={user.morning.url}
                         onPreferencesChange={this.handlePreferencesLabels}
-                    />:null}
+                    /> : null}
 
-                {this.state.eveningBeverageModal?
+                {this.state.eveningBeverageModal ?
                     <CustomModal
                         userId={this.props.match.params.id}
+                        isBeverage={true}
                         morningLabel={this.state.eveningLabel}
                         eveningLabel={this.state.eveningLabel}
                         modalState={this.state.eveningBeverageModal}
                         title='Evening Beverage'
+                        lunchSlotsData={this.state.lunchSlotsData}
                         message='Ahhh! Tiring day. Want some refreshment?'
                         url={user.evening.url}
                         onPreferencesChange={this.handlePreferencesLabels}
-                    />:null}
+                    /> : null}
 
-                {this.state.lunchModal?
+                {this.state.lunchModal ?
                     <CustomModal
                         userId={this.props.match.params.id}
+                        isBeverage={false}
                         modalState={this.state.lunchModal}
                         lunchSlotsData={this.state.lunchSlotsData}
                         title="Lunch Slots"
                         message="Have some food"
                         url={user.lunch.url}
                         onSlotsBook={this.handleSlotBooking}
-                    />:null}
+                    /> : null}
 
 
                 {/* <Modal isVisible={this.state.eveningBeverageModal}
@@ -295,7 +334,7 @@ const styles = StyleSheet.create({
         flex: 1,
         alignItems: 'center',
         backgroundColor: 'rgb(243,243,243)',
-        zIndex:-100
+        zIndex: -100
     },
     title: {
         fontWeight: 'bold',
