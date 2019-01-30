@@ -46,7 +46,7 @@ export class App extends Component<Props> {
                         <Route exact path="/login" component={Login}/>
                         <Route exact path="/homeScreen/:id" component={HomeScreen}/>
                         <Route exact path="/orderScreen" component={OrderScreen}/>
-                        <Route exact path="/pendingOrders" component={PendingOrdersScreen}/>
+                        <Route exact path="/pendingOrders/:id" component={PendingOrdersScreen}/>
                     </Switch>
                 </View>
             </NativeRouter>
