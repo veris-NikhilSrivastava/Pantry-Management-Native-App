@@ -3,21 +3,10 @@ import {
     StyleSheet,
     Text,
     View,
-    SafeAreaView,
-    ScrollView,
-    Dimensions,
     Image,
     TouchableOpacity,
-    TextInput,
     AsyncStorage
 } from 'react-native';
-import {createDrawerNavigator, DrawerActions, DrawerItems} from "react-navigation";
-import Login from "../Login/login";
-import SplashScreen from "../Splash Screen/splashScreen";
-import {Container, Header, Left, Body, Right, Button, Icon, Title} from 'native-base';
-
-import {Card, CardTitle, CardContent, CardAction, CardButton, CardImage} from 'react-native-material-cards'
-import Modal from "react-native-modal";
 import CustomHeader from "../../Components/Header/Header";
 import CustomModal from "../Modal/Modal";
 import Axios from 'axios';
@@ -63,6 +52,11 @@ const user = {
             message:'Feeling hungy? Meet me in the Pantry'
         }
 };
+
+/*
+* GET user Id>>>>
+* */
+
 const axios = Axios.create({});
 
 
@@ -76,16 +70,11 @@ export class HomeScreen extends Component {
             beverageDetails:[],
             morningLabel:'',
             eveningLabel:'',
-
         }
-
     };
-
-    componentDidMount(){
-        this.setState({isLoading:true})
-        this.getUserId();
+    handleBeveragesAPI=()=>{
         const beverageURL=`https://h3sp46qcq0.execute-api.us-east-1.amazonaws.com/beverage?user_id=${this.props.match.params.id}`;
-        console.log(beverageURL)
+        // console.log(beverageURL)
         axios
             .get(beverageURL)
             .then(res=>{
@@ -116,6 +105,39 @@ export class HomeScreen extends Component {
             .catch(err=>{
                 alert('something wrong happened')
             })
+    }
+
+    componentDidMount(){
+        this.setState({isLoading:true})
+        this.getUserId();
+        this.handleBeveragesAPI();
+        const slotsURL=`https://4np5t34b52.execute-api.us-east-1.amazonaws.com/slots?user_id=${this.props.match.params.id}`;
+        console.log(slotsURL)
+        axios
+            .get(slotsURL)
+            .then(res=>{
+                    console.log(res.data)
+                    this.setState({lunchSlotsData:res.data})
+                switch(res.data.selected){
+                    case 0:
+                        this.setState({lunchSlot:'1:30-2:00'})
+                        break;
+                    case 1:
+                        this.setState({lunchSlot:'2:00-2:30'})
+                        break;
+                    case 2:
+                        this.setState({lunchSlot:'2:30-3:00'})
+                        break;
+                    case 3:
+                        this.setState({lunchSlot:'3:00-3:30'})
+                        break;
+                    default:
+                        this.setState({lunchSlot:'Select'})
+
+                }
+                    // console.log(res.data.lunchSlots)
+            })
+
 
     }
 
@@ -158,6 +180,21 @@ export class HomeScreen extends Component {
         }
     }
 
+    handleSlotBooking=(slotId)=>{
+        switch (slotId) {
+            case 0:this.setState({lunchSlot:'1:30-2:30'})
+                break;
+            case 1:this.setState({lunchSlot:'2:00-2:30'})
+                break;
+            case 2:this.setState({lunchSlot:'2:30-3:00'})
+                break;
+            case 3:this.setState({lunchSlot:'3:00-3:30'})
+                break;
+
+
+        }
+    }
+
     render() {
         return (
             <View style={styles.container}>
@@ -182,9 +219,10 @@ export class HomeScreen extends Component {
                         <TouchableOpacity
                             onPress={() => this.setState({morningBeverageModal: !this.state.morningBeverageModal})}>
                             <Text style={{fontWeight: 'bold', fontSize: 20,fontFamily:'Raleway-Bold'}}>{this.state.morningLabel} </Text>
-                        </TouchableOpacity><Text style={{fontSize: 20,fontFamily:'Raleway-Light'}}>in the Morning, Lunch at </Text>
+                        </TouchableOpacity>
+                        <Text style={{fontSize: 20,fontFamily:'Raleway-Light'}}>in the Morning, Lunch at </Text>
                         <TouchableOpacity onPress={() => this.setState({lunchModal: !this.state.lunchModal})}>
-                            <Text style={{fontWeight: 'bold', fontSize: 20,fontFamily:'Raleway-Bold'}}>1:30 </Text>
+                            <Text style={{fontWeight: 'bold', fontSize: 20,fontFamily:'Raleway-Bold'}}>{this.state.lunchSlot} </Text>
                         </TouchableOpacity>
                         <Text style={{fontSize: 20,fontFamily:'Raleway-Light'}}>and </Text>
                         <TouchableOpacity
@@ -223,10 +261,11 @@ export class HomeScreen extends Component {
                     <CustomModal
                         userId={this.props.match.params.id}
                         modalState={this.state.lunchModal}
-                        title={user.lunch.title}
-                        message={user.lunch.message}
+                        lunchSlotsData={this.state.lunchSlotsData}
+                        title="Lunch Slots"
+                        message="Have some food"
                         url={user.lunch.url}
-                        onPreferencesChange={this.handlePreferencesLabels}
+                        onSlotsBook={this.handleSlotBooking}
                     />:null}
 
 
@@ -251,36 +290,12 @@ export class HomeScreen extends Component {
     }
 }
 
-{/*// const CustomDrawerComponent = (props) => (
-                // <SafeAreaView style={{flex: 1}}>
-                // <View style={{height: 150, backgroundColor: 'white'}}>
-                // <Image source={require('../../assets/Images/logo.gif')}
-                //                    style={{height: 120, width: 120, borderRadius: 60}}/>
-                //         </View>
-                //         <ScrollView>
-                //             <DrawerItems {...props}/>
-                //         </ScrollView>
-                //     </SafeAreaView>
-                //
-                // );
-                //
-                // const AppDrawerNavigator = createDrawerNavigator({
-                //
-                //     // For each screen that you can navigate to, create a new entry like this:
-                //     Login: Login,
-                //     Splash: SplashScreen
-                //
-                // }, {
-                //     contentComponent: CustomDrawerComponent
-                // });
-*/
-}
-
 const styles = StyleSheet.create({
     container: {
         flex: 1,
         alignItems: 'center',
-        backgroundColor: 'rgb(243,243,243)'
+        backgroundColor: 'rgb(243,243,243)',
+        zIndex:-100
     },
     title: {
         fontWeight: 'bold',
